@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 13px;
+      padding: 14px 16px;
+      color: #2c2c2c;
+      background: #fff;
+      margin: 0;
+    }
+    h2 { font-size: 14px; margin: 0 0 12px; color: #1a1a2e; }
+
+    .section { margin-bottom: 12px; }
+    .label { display: block; font-weight: 600; margin-bottom: 4px; color: #333; font-size: 12px; }
+
+    select {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #bbb;
+      border-radius: 5px;
+      font-size: 12px;
+      background: #fafafa;
+    }
+    select:focus { outline: 2px solid #4285f4; border-color: transparent; }
+
+    #neoFields {
+      display: none;
+      margin-top: 8px;
+      background: #f4f7ff;
+      border: 1px solid #c5d4f5;
+      border-radius: 6px;
+      padding: 9px 11px;
+    }
+    #neoFields.show { display: block; }
+
+    .neo-row { display: flex; flex-direction: column; margin-bottom: 7px; }
+    .neo-row:last-child { margin-bottom: 0; }
+    .neo-row label {
+      font-weight: normal;
+      font-size: 11px;
+      color: #555;
+      margin-bottom: 3px;
+    }
+    .neo-row input {
+      width: 100%;
+      padding: 5px 8px;
+      border: 1px solid #bbb;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    hr { border: none; border-top: 1px solid #e0e0e0; margin: 12px 0; }
+
+    .step-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      background: #e8f0fe;
+      color: #1967d2;
+      border-radius: 3px;
+      padding: 2px 6px;
+      margin-bottom: 7px;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+    .btn:disabled { opacity: .4; cursor: default; }
+    .btn-yellow { background: #f9c74f; color: #333; }
+    .btn-blue   { background: #1a73e8; color: #fff; }
+    .btn-ghost  {
+      background: #f1f1f1;
+      color: #555;
+      border: 1px solid #ccc;
+      font-weight: normal;
+    }
+
+    .msg {
+      margin-top: 8px;
+      padding: 7px 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      line-height: 1.5;
+      display: none;
+    }
+    .msg.show    { display: block; }
+    .msg.info    { background: #e8f0fe; color: #1967d2; }
+    .msg.success { background: #e6f4ea; color: #137333; }
+    .msg.warn    { background: #fef7e0; color: #7a4f00; }
+
+    .note {
+      font-size: 11px;
+      color: #777;
+      margin-top: 7px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <h2>🔄 Replace Pronouns</h2>
+
+  <!-- FROM -->
+  <div class="section">
+    <label class="label" for="fromSel">Current pronouns (FROM):</label>
+    <select id="fromSel">
+      <option value="epicene">they / them / themself / theirs (singular)</option>      <option value="masculine">he / him / himself / his</option>
+      <option value="feminine">she / her / herself / hers</option>
+      <option value="plural">they / them / themselves / theirs (plural)</option>
+      <option value="neuter">it / it / itself / its</option>
+    </select>
+  </div>
+
+  <!-- TO -->
+  <div class="section">
+    <label class="label" for="toSel">New pronouns (TO):</label>
+    <select id="toSel" onchange="onToChange()">
+      <option value="masculine">he / him / himself / his</option>
+      <option value="feminine">she / her / herself / hers</option>
+      <option value="epicene">they / them / themself / theirs (singular)</option>
+      <option value="plural">they / them / themselves / theirs (plural)</option>
+      <option value="neuter">it / it / itself / its</option>
+      <option value="neo">✏️ Neopronouns — enter below…</option>
+    </select>
+
+    <div id="neoFields">
+      <div class="neo-row">
+        <label>Nominative (subject) — e.g. xe, ze, ey</label>
+        <input id="nNom" type="text" placeholder="xe">
+      </div>
+      <div class="neo-row">
+        <label>Accusative (object) — e.g. xem, hir, em</label>
+        <input id="nAcc" type="text" placeholder="xem">
+      </div>
+      <div class="neo-row">
+        <label>Reflexive — e.g. xemself, hirself</label>
+        <input id="nRefl" type="text" placeholder="xemself">
+      </div>
+      <div class="neo-row">
+        <label>Independent genitive ("it is ___")</label>
+        <input id="nIndGen" type="text" placeholder="xyrs">
+      </div>
+      <div class="neo-row">
+        <label>Dependent genitive ("___ book")</label>
+        <input id="nDepGen" type="text" placeholder="xyr">
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+<!-- STEP 1 -->
+  <div class="section">
+    <div class="step-tag">Step 1 — Review</div>
+    <button class="btn btn-yellow" onclick="doHighlight()">
+      🔍 Highlight Pronouns in Document
+    </button>
+    <div id="msgHighlight" class="msg"></div>
+    <p class="note">
+      ⚠️ Words like <em>her</em> and <em>his</em> do double duty (object + possessive).
+      The script defaults to the <strong>possessive</strong> form when there's overlap —
+      most common in clinical writing. Review highlights before replacing.
+    </p>
+  </div>
+
+  <!-- STEP 1b — VERB FIX -->
+  <div class="section" id="verbSection" style="display:none;">
+    <div class="step-tag">Step 1b — Fix Verbs (optional)</div>
+    <button class="btn btn-yellow" onclick="doFixVerbs()">
+      🔧 Fix Verbs After "they" (run before replacing)
+    </button>
+    <div id="msgVerbs" class="msg"></div>
+    <p class="note">
+      Fixes irregular verbs immediately following "they":
+      are→is, were→was, have→has, do→does, don't→doesn't, etc.
+      Run this <strong>before</strong> replacing pronouns.
+    </p>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="section">
+    <div class="step-tag">Step 2 — Replace</div>
+    <button id="btnReplace" class="btn btn-blue" disabled onclick="doReplace()">
+      ✅ Replace All Highlighted Pronouns
+    </button>
+    <button id="btnSkip" class="btn btn-ghost" disabled onclick="doSkip()">⬜ Skip This Instance</button>
+    <button class="btn btn-ghost" onclick="doHighlightTo()">🟠 Highlight Replaced Pronouns</button>
+    <div style="display:flex; gap:6px;">
+      <button class="btn btn-ghost" style="flex:1;" onclick="doPrevPronoun()">⬅ Previous</button>
+      <button class="btn btn-ghost" style="flex:1;" onclick="doNextPronoun()">➡ Next</button>
+    </div>
+    <button class="btn btn-ghost" onclick="doClear()">✖ Clear Highlights &amp; Done</button>
+    <div id="msgReplace" class="msg"></div>
+  </div>
+
+  <script>
+    function onToChange() {
+      var isNeo = document.getElementById('toSel').value === 'neo';
+      document.getElementById('neoFields').classList.toggle('show', isNeo);
+    }
+
+    function getNeoForms() {
+      return [
+        document.getElementById('nNom').value.trim(),
+        document.getElementById('nAcc').value.trim(),
+        document.getElementById('nRefl').value.trim(),
+        document.getElementById('nIndGen').value.trim(),
+        document.getElementById('nDepGen').value.trim()
+      ];
+    }
+
+    function setMsg(id, type, html) {
+      var el = document.getElementById(id);
+      el.className = 'msg show ' + type;
+      el.innerHTML = html;
+    }
+    function clearMsg(id) {
+      var el = document.getElementById(id);
+      el.className = 'msg';
+      el.innerHTML = '';
+    }
+
+    function doHighlight() {
+      setMsg('msgHighlight', 'info', '⏳ Scanning document…');
+      document.getElementById('btnReplace').disabled = true;
+
+      google.script.run
+        .withSuccessHandler(function(count) {
+          if (count === 0) {
+            setMsg('msgHighlight', 'warn',
+              '⚠️ No instances of those pronouns found.');
+          } else {
+            setMsg('msgHighlight', 'info',
+              '🟡 <strong>' + count + '</strong> instance(s) highlighted. ' +
+              'Review in document, then click Replace below.');
+            document.getElementById('btnReplace').disabled = false;
+            document.getElementById('btnSkip').disabled = false;
+            var fromVal = document.getElementById('fromSel').value;
+            var showVerbs = (fromVal === 'epicene' || fromVal === 'plural');
+            document.getElementById('verbSection').style.display = showVerbs ? 'block' : 'none';
+          }
+        })
+        .withFailureHandler(function(err) {
+          setMsg('msgHighlight', 'warn', '❌ Error: ' + err.message);
+        })
+        .highlightPronouns(document.getElementById('fromSel').value);
+    }
+
+    function doReplace() {
+      var fromKey  = document.getElementById('fromSel').value;
+      var toKey    = document.getElementById('toSel').value;
+      var neoForms = (toKey === 'neo') ? getNeoForms() : null;
+
+      if (toKey === 'neo' && neoForms.some(function(f) { return !f; })) {
+        alert('Please fill in all 5 neopronoun fields before replacing.');
+        return;
+      }
+      if (fromKey === toKey && toKey !== 'neo') {
+        alert('The FROM and TO sets are the same — nothing to replace.');
+        return;
+      }
+
+      setMsg('msgReplace', 'info', '⏳ Replacing pronouns…');
+      document.getElementById('btnReplace').disabled = true;
+
+      google.script.run
+        .withSuccessHandler(function(result) {
+          clearMsg('msgHighlight');
+          setMsg('msgReplace', 'success',
+            '✅ Done! Replaced <strong>' + result.count + '</strong> instance(s). ' +
+            'Review for any overlapping forms.');
+        })
+        .withFailureHandler(function(err) {
+          setMsg('msgReplace', 'warn', '❌ Error: ' + err.message);
+          document.getElementById('btnReplace').disabled = false;
+        })
+        .replacePronouns(fromKey, toKey, neoForms);
+    }
+
+function doFixVerbs() {
+      setMsg('msgVerbs', 'info', '⏳ Fixing verbs…');
+      google.script.run
+        .withSuccessHandler(function(result) {
+          setMsg('msgVerbs', 'success',
+            '✅ Fixed <strong>' + result.count + '</strong> verb(s).');
+        })
+        .withFailureHandler(function(err) {
+          setMsg('msgVerbs', 'warn', '❌ ' + err.message);
+        })
+        .fixVerbsAfterThey();
+    }
+
+
+function doClear() {
+      pronounIndex = 0;
+      clearMsg('msgHighlight');
+      clearMsg('msgReplace');
+      document.getElementById('btnReplace').disabled = true;
+      document.getElementById('btnSkip').disabled = true;
+      document.getElementById('verbSection').style.display = 'none';
+      google.script.run
+        .withSuccessHandler(function() {})
+        .withFailureHandler(function(err) { alert('Error: ' + err.message); })
+        .clearHighlightedPronouns(document.getElementById('fromSel').value);
+    }
+
+var pronounIndex = 0;
+
+    function doNextPronoun() {
+      var toKey = document.getElementById('toSel').value;
+      if (toKey === 'neo') {
+        alert('Scroll to next is not available for neopronouns.');
+        return;
+      }
+      google.script.run
+        .withSuccessHandler(function(result) {
+          if (result.total === 0) {
+            setMsg('msgReplace', 'warn', '⚠️ No instances found to scroll to.');
+            return;
+          }
+          pronounIndex++;
+          setMsg('msgReplace', 'info',
+            '📍 Showing instance ' + ((pronounIndex % result.total) + 1) +
+            ' of ' + result.total + '. Fix verb if needed, then click again or clear.');
+        })
+        .withFailureHandler(function(err) {
+          setMsg('msgReplace', 'warn', '❌ ' + err.message);
+        })
+        .scrollToNthPronoun(toKey, pronounIndex);
+    }
+
+    function doHighlightTo() {
+      var toKey = document.getElementById('toSel').value;
+      if (toKey === 'neo') {
+        alert('Highlight TO is not available for neopronouns.');
+        return;
+      }
+      setMsg('msgReplace', 'info', '⏳ Highlighting replaced pronouns…');
+      google.script.run
+        .withSuccessHandler(function(result) {
+          setMsg('msgReplace', 'info',
+            '🟠 <strong>' + result.count + '</strong> replaced pronoun(s) highlighted.');
+        })
+        .withFailureHandler(function(err) {
+          setMsg('msgReplace', 'warn', '❌ ' + err.message);
+        })
+        .highlightToPronouns(toKey);
+    }
+
+    function doPrevPronoun() {
+      var toKey = document.getElementById('toSel').value;
+      if (toKey === 'neo') {
+        alert('Scroll to previous is not available for neopronouns.');
+        return;
+      }
+      if (pronounIndex > 0) pronounIndex--;
+      google.script.run
+        .withSuccessHandler(function(result) {
+          if (result.total === 0) {
+            setMsg('msgReplace', 'warn', '⚠️ No instances found.');
+            return;
+          }
+          setMsg('msgReplace', 'info',
+            '📍 Showing instance ' + ((pronounIndex % result.total) + 1) +
+            ' of ' + result.total + '.');
+        })
+        .withFailureHandler(function(err) {
+          setMsg('msgReplace', 'warn', '❌ ' + err.message);
+        })
+        .scrollToNthPronoun(toKey, pronounIndex);
+    }
+
+  </script>
+</body>
+</html>

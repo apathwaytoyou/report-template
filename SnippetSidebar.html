@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 12px;
+      padding: 10px 12px;
+      color: #2c2c2c;
+      background: #fff;
+      margin: 0;
+    }
+
+    h2 {
+      font-size: 14px;
+      margin: 0 0 10px;
+      color: #1a1a2e;
+    }
+
+    .top-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .section {
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+
+    .section-header {
+      background: #f0f4ff;
+      padding: 7px 10px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+      color: #1a1a2e;
+    }
+    .section-header:hover { background: #e2eaff; }
+    .section-header .arrow { font-size: 10px; color: #666; }
+
+    .section-body {
+      padding: 8px 10px;
+      display: none;
+      border-top: 1px solid #ddd;
+    }
+    .section-body.open { display: block; }
+
+    .slot {
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed #e8e8e8;
+    }
+    .slot:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .slot-label {
+      font-weight: 700;
+      font-size: 11.5px;
+      color: #333;
+      margin-bottom: 1px;
+    }
+    .slot-sub {
+      font-size: 10.5px;
+      color: #777;
+      margin-bottom: 5px;
+      line-height: 1.4;
+      font-style: italic;
+    }
+
+    textarea {
+      width: 100%;
+      height: 58px;
+      font-size: 11.5px;
+      padding: 5px 7px;
+      border: 1px solid #bbb;
+      border-radius: 4px;
+      resize: vertical;
+      font-family: inherit;
+      background: #fafafa;
+      line-height: 1.4;
+    }
+    textarea:focus { outline: 2px solid #4285f4; border-color: transparent; background: #fff; }
+
+    .slot-footer {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 5px;
+    }
+
+    .btn {
+      padding: 5px 11px;
+      border: none;
+      border-radius: 4px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn:disabled { opacity: .4; cursor: default; }
+    .btn-push   { background: #1a73e8; color: #fff; }
+    .btn-push:hover:not(:disabled) { background: #1557b0; }
+    .btn-all    { background: #188038; color: #fff; flex: 1; }
+    .btn-all:hover:not(:disabled)  { background: #0f5928; }
+    .btn-clear  { background: #f1f1f1; color: #555; border: 1px solid #ccc; font-weight: normal; }
+    .btn-clear:hover { background: #e2e2e2; }
+
+    .slot-msg {
+      font-size: 10.5px;
+      flex: 1;
+      line-height: 1.3;
+    }
+    .slot-msg.ok   { color: #137333; }
+    .slot-msg.err  { color: #c62828; }
+    .slot-msg.info { color: #1967d2; }
+
+    .global-msg {
+      margin-top: 8px;
+      padding: 7px 10px;
+      border-radius: 5px;
+      font-size: 11.5px;
+      line-height: 1.5;
+      display: none;
+    }
+    .global-msg.show    { display: block; }
+    .global-msg.ok      { background: #e6f4ea; color: #137333; }
+    .global-msg.err     { background: #fce8e6; color: #c62828; }
+    .global-msg.info    { background: #e8f0fe; color: #1967d2; }
+
+    .hint {
+      font-size: 10.5px;
+      color: #888;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+<h2>📋 Diagnostic Snippets</h2>
+<p class="hint">One line per bullet. Push slot-by-slot or use <strong>Push All</strong>. Bullets always append.</p>
+
+<div class="top-bar">
+  <button class="btn btn-all" onclick="pushAll()">⬆ Push All Filled Slots</button>
+  <button class="btn btn-clear" onclick="clearAll()">✖ Clear Sidebar</button>
+</div>
+
+<!-- ═══ ASD CRITERIA A ═══ -->
+<div class="section">
+  <div class="section-header" onclick="toggleSection(this)">
+    ∞ Au — Criteria A <span class="arrow">▶</span>
+  </div>
+  <div class="section-body">
+
+    <div class="slot" id="slot-ASD-A1">
+      <div class="slot-label">A1</div>
+      <div class="slot-sub">Social-emotional reciprocity</div>
+      <textarea id="txt-ASD-A1" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('ASD-A1')">Push</button>
+        <span class="slot-msg" id="msg-ASD-A1"></span>
+      </div>
+    </div>
+
+    <div class="slot" id="slot-ASD-A2">
+      <div class="slot-label">A2</div>
+      <div class="slot-sub">Nonverbal behaviors in social interaction</div>
+      <textarea id="txt-ASD-A2" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('ASD-A2')">Push</button>
+        <span class="slot-msg" id="msg-ASD-A2"></span>
+      </div>
+    </div>
+
+    <div class="slot" id="slot-ASD-A3">
+      <div class="slot-label">A3</div>
+      <div class="slot-sub">Developing, maintaining, understanding relationships</div>
+      <textarea id="txt-ASD-A3" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('ASD-A3')">Push</button>
+        <span class="slot-msg" id="msg-ASD-A3"></span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ ASD CRITERIA B ═══ -->
+<div class="section">
+  <div class="section-header" onclick="toggleSection(this)">
+    ∞ Au — Criteria B <span class="arrow">▶</span>
+  </div>
+  <div class="section-body">
+
+    <div class="slot" id="slot-ASD-B1">
+      <div class="slot-label">B1</div>
+      <div class="slot-sub">Repeated motor movements, objects, or speech</div>
+      <textarea id="txt-ASD-B1" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('ASD-B1')">Push</button>
+        <span class="slot-msg" id="msg-ASD-B1"></span>
+      </div>
+    </div>
+
+    <div class="slot" id="slot-ASD-B2">
+      <div class="slot-label">B2</div>
+      <div class="slot-sub">Desire for consistency or predictability</div>
+      <textarea id="txt-ASD-B2" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('ASD-B2')">Push</button>
+        <span class="slot-msg" id="msg-ASD-B2"></span>
+      </div>
+    </div>
+
+    <div class="slot" id="slot-ASD-B3">
+      <div class="slot-label">B3</div>
+      <div class="slot-sub">Focused and enduring interests</div>
+      <textarea id="txt-ASD-B3" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('ASD-B3')">Push</button>
+        <span class="slot-msg" id="msg-ASD-B3"></span>
+      </div>
+    </div>
+
+    <div class="slot" id="slot-ASD-B4">
+      <div class="slot-label">B4</div>
+      <div class="slot-sub">Sensory responses</div>
+      <textarea id="txt-ASD-B4" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('ASD-B4')">Push</button>
+        <span class="slot-msg" id="msg-ASD-B4"></span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ ADHD A1 — INATTENTIVE ═══ -->
+<div class="section">
+  <div class="section-header" onclick="toggleSection(this)">
+    ⚡ ADHD — A1 Inattentive <span class="arrow">▶</span>
+  </div>
+  <div class="section-body">
+
+    <div class="slot" id="slot-ADHD-A1a">
+      <div class="slot-label">A1a</div>
+      <div class="slot-sub">Variable detail perception (oversights)</div>
+      <textarea id="txt-ADHD-A1a" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('ADHD-A1a')">Push</button>
+        <span class="slot-msg" id="msg-ADHD-A1a"></span>
+      </div>
+    </div>
+
+    <div class="slot" id="slot-ADHD-A1b">
+      <div class="slot-label">A1b</div>
+      <div class="slot-sub">Interest-based attention endurance</div>
+      <textarea id="txt-ADHD-A1b" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('ADHD-A1b')">Push</button>
+        <span class="slot-msg" id="msg-ADHD-A1b"></span>
+      </div>
+    </div>
+
+    <div class="slot" id="slot-ADHD-A1c">
+      <div class="slot-label">A1c</div>
+      <div class="slot-sub">Integrative listening</div>
+      <textarea id="txt-ADHD-A1c" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('ADHD-A1c')">Push</button>
+        <span class="slot-msg" id="msg-ADHD-A1c"></span>
+      </div>
+    </div>
+
+    <div class="slot" id="slot-ADHD-A1d">
+      <div class="slot-label">A1d</div>
+      <div class="slot-sub">Dynamic task engagement</div>
+      <textarea id="txt-ADHD-A1d" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('ADHD-A1d')">Push</button>
+        <span class="slot-msg" id="msg-ADHD-A1d"></span>
+      </div>
+    </div>
+
+    <div class="slot" id="slot-ADHD-A1e">
+      <div class="slot-label">A1e</div>
+      <div class="slot-sub">Organizes and plans non-linearly</div>
+      <textarea id="txt-ADHD-A1e" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('ADHD-A1e')">Push</button>
+        <span class="slot-msg" id="msg-ADHD-A1e"></span>
+      </div>
+    </div>
+
+    <div class="slot" id="slot-ADHD-A1f">
+      <div class="slot-label">A1f</div>
+      <div class="slot-sub">Interest-based prioritization (avoiding)</div>
+      <textarea id="txt-ADHD-A1f" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('ADHD-A1f')">Push</button>
+        <span class="slot-msg" id="msg-ADHD-A1f"></span>
+      </div>
+    </div>
+
+    <div class="slot" id="slot-ADHD-A1g">
+      <div class="slot-label">A1g</div>
+      <div class="slot-sub">Object management differences (losing items)</div>
+      <textarea id="txt-ADHD-A1g" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('ADHD-A1g')">Push</button>
+        <span class="slot-msg" id="msg-ADHD-A1g"></span>
+      </div>
+    </div>
+
+    <div class="slot" id="slot-ADHD-A1h">
+      <div class="slot-label">A1h</div>
+      <div class="slot-sub">Open attention style (distractible)</div>
+      <textarea id="txt-ADHD-A1h" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('ADHD-A1h')">Push</button>
+        <span class="slot-msg" id="msg-ADHD-A1h"></span>
+      </div>
+    </div>
+
+    <div class="slot" id="slot-ADHD-A1i">
+      <div class="slot-label">A1i</div>
+      <div class="slot-sub">Spontaneous memory recall (forgetful)</div>
+      <textarea id="txt-ADHD-A1i" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('ADHD-A1i')">Push</button>
+        <span class="slot-msg" id="msg-ADHD-A1i"></span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ ADHD A2 — HYPERACTIVE/IMPULSIVE ═══ -->
+<div class="section">
+  <div class="section-header" onclick="toggleSection(this)">
+    ⚡ ADHD — A2 Hyperactive/Impulsive <span class="arrow">▶</span>
+  </div>
+  <div class="section-body">
+
+    <div class="slot" id="slot-ADHD-A2a">
+      <div class="slot-label">A2a</div>
+      <div class="slot-sub">Fidgeting</div>
+      <textarea id="txt-ADHD-A2a" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('ADHD-A2a')">Push</button>
+        <span class="slot-msg" id="msg-ADHD-A2a"></span>
+      </div>
+    </div>
+
+    <div class="slot" id="slot-ADHD-A2b">
+      <div class="slot-label">A2b</div>
+      <div class="slot-sub">Movement preference (over staying still)</div>
+      <textarea id="txt-ADHD-A2b" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('ADHD-A2b')">Push</button>
+        <span class="slot-msg" id="msg-ADHD-A2b"></span>
+      </div>
+    </div>
+
+    <div class="slot" id="slot-ADHD-A2c">
+      <div class="slot-label">A2c</div>
+      <div class="slot-sub">Gross-motor engagement (restlessness)</div>
+      <textarea id="txt-ADHD-A2c" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('ADHD-A2c')">Push</button>
+        <span class="slot-msg" id="msg-ADHD-A2c"></span>
+      </div>
+    </div>
+
+    <div class="slot" id="slot-ADHD-A2d">
+      <div class="slot-label">A2d</div>
+      <div class="slot-sub">Sound engagement (not quiet)</div>
+      <textarea id="txt-ADHD-A2d" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('ADHD-A2d')">Push</button>
+        <span class="slot-msg" id="msg-ADHD-A2d"></span>
+      </div>
+    </div>
+
+    <div class="slot" id="slot-ADHD-A2e">
+      <div class="slot-label">A2e</div>
+      <div class="slot-sub">High activity level (on-the-go)</div>
+      <textarea id="txt-ADHD-A2e" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('ADHD-A2e')">Push</button>
+        <span class="slot-msg" id="msg-ADHD-A2e"></span>
+      </div>
+    </div>
+
+    <div class="slot" id="slot-ADHD-A2f">
+      <div class="slot-label">A2f</div>
+      <div class="slot-sub">Verbal processing (talkative)</div>
+      <textarea id="txt-ADHD-A2f" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('ADHD-A2f')">Push</button>
+        <span class="slot-msg" id="msg-ADHD-A2f"></span>
+      </div>
+    </div>
+
+    <div class="slot" id="slot-ADHD-A2g">
+      <div class="slot-label">A2g</div>
+      <div class="slot-sub">Dynamic conversation style (interrupting)</div>
+      <textarea id="txt-ADHD-A2g" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('ADHD-A2g')">Push</button>
+        <span class="slot-msg" id="msg-ADHD-A2g"></span>
+      </div>
+    </div>
+
+    <div class="slot" id="slot-ADHD-A2h">
+      <div class="slot-label">A2h</div>
+      <div class="slot-sub">Action orientation (difficulty waiting)</div>
+      <textarea id="txt-ADHD-A2h" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('ADHD-A2h')">Push</button>
+        <span class="slot-msg" id="msg-ADHD-A2h"></span>
+      </div>
+    </div>
+
+    <div class="slot" id="slot-ADHD-A2i">
+      <div class="slot-label">A2i</div>
+      <div class="slot-sub">Ready participation (jumping in)</div>
+      <textarea id="txt-ADHD-A2i" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('ADHD-A2i')">Push</button>
+        <span class="slot-msg" id="msg-ADHD-A2i"></span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ APPENDIX SLOTS ═══ -->
+<div class="section">
+  <div class="section-header" onclick="toggleSection(this)">
+    📎 Appendix Slots <span class="arrow">▶</span>
+  </div>
+  <div class="section-body">
+
+    <div class="slot" id="slot-APP-E">
+      <div class="slot-label">Appendix E</div>
+      <textarea id="txt-APP-E" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('APP-E')">Push</button>
+        <span class="slot-msg" id="msg-APP-E"></span>
+      </div>
+    </div>
+
+    <div class="slot" id="slot-APP-F">
+      <div class="slot-label">Appendix F</div>
+      <textarea id="txt-APP-F" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('APP-F')">Push</button>
+        <span class="slot-msg" id="msg-APP-F"></span>
+      </div>
+    </div>
+
+    <div class="slot" id="slot-APP-G">
+      <div class="slot-label">Appendix G</div>
+      <textarea id="txt-APP-G" placeholder="One bullet per line…"></textarea>
+      <div class="slot-footer">
+        <button class="btn btn-push" onclick="pushOne('APP-G')">Push</button>
+        <span class="slot-msg" id="msg-APP-G"></span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="globalMsg" class="global-msg"></div>
+
+<script>
+  // ── Section toggle ──────────────────────────────────────────────
+  function toggleSection(header) {
+    var body  = header.nextElementSibling;
+    var arrow = header.querySelector('.arrow');
+    var open  = body.classList.toggle('open');
+    arrow.textContent = open ? '▼' : '▶';
+  }
+
+  // ── Helpers ─────────────────────────────────────────────────────
+  function getLines(slotId) {
+    var raw = document.getElementById('txt-' + slotId).value;
+    return raw.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+  }
+
+  function setSlotMsg(slotId, type, text) {
+    var el = document.getElementById('msg-' + slotId);
+    el.className = 'slot-msg ' + type;
+    el.textContent = text;
+    // auto-clear after 4s
+    setTimeout(function(){ el.textContent = ''; el.className = 'slot-msg'; }, 4000);
+  }
+
+  function setGlobalMsg(type, html) {
+    var el = document.getElementById('globalMsg');
+    el.className = 'global-msg show ' + type;
+    el.innerHTML = html;
+    setTimeout(function(){ el.className = 'global-msg'; }, 6000);
+  }
+
+  // ── Push one slot ────────────────────────────────────────────────
+  function pushOne(slotId) {
+    var lines = getLines(slotId);
+    if (lines.length === 0) {
+      setSlotMsg(slotId, 'err', 'Nothing to push.');
+      return;
+    }
+    setSlotMsg(slotId, 'info', '⏳ Pushing…');
+    google.script.run
+      .withSuccessHandler(function(result) {
+        if (result.success) {
+          setSlotMsg(slotId, 'ok', '✅ ' + result.message);
+        } else {
+          setSlotMsg(slotId, 'err', '❌ ' + result.message);
+        }
+      })
+      .withFailureHandler(function(err) {
+        setSlotMsg(slotId, 'err', '❌ ' + err.message);
+      })
+      .pushSnippet(slotId, lines);
+  }
+
+  // ── Push all filled slots ────────────────────────────────────────
+  function pushAll() {
+    var allSlotIds = [
+      'ASD-A1','ASD-A2','ASD-A3',
+      'ASD-B1','ASD-B2','ASD-B3','ASD-B4',
+      'ADHD-A1a','ADHD-A1b','ADHD-A1c','ADHD-A1d','ADHD-A1e',
+      'ADHD-A1f','ADHD-A1g','ADHD-A1h','ADHD-A1i',
+      'ADHD-A2a','ADHD-A2b','ADHD-A2c','ADHD-A2d','ADHD-A2e',
+      'ADHD-A2f','ADHD-A2g','ADHD-A2h','ADHD-A2i',
+      'APP-E','APP-F','APP-G'
+    ];
+
+    var payload = {};
+    var count   = 0;
+    allSlotIds.forEach(function(id) {
+      var lines = getLines(id);
+      if (lines.length > 0) { payload[id] = lines; count++; }
+    });
+
+    if (count === 0) {
+      setGlobalMsg('err', '⚠️ No slots have content to push.');
+      return;
+    }
+
+    setGlobalMsg('info', '⏳ Pushing ' + count + ' slot(s)…');
+
+    google.script.run
+      .withSuccessHandler(function(results) {
+        var ok  = results.filter(function(r){ return  r.success; }).length;
+        var bad = results.filter(function(r){ return !r.success; });
+        var msg = '✅ Pushed ' + ok + ' slot(s) successfully.';
+        if (bad.length) {
+          msg += '<br>⚠️ Failed: ' + bad.map(function(r){ return r.slotId; }).join(', ');
+        }
+        setGlobalMsg(bad.length ? 'err' : 'ok', msg);
+        // surface individual errors on their slots too
+        bad.forEach(function(r){ setSlotMsg(r.slotId, 'err', '❌ ' + r.message); });
+      })
+      .withFailureHandler(function(err) {
+        setGlobalMsg('err', '❌ ' + err.message);
+      })
+      .pushAllSnippets(payload);
+  }
+
+  // ── Clear sidebar textareas (does NOT touch the document) ────────
+  function clearAll() {
+    if (!confirm('Clear all text from the sidebar? This does not affect the document.')) return;
+    document.querySelectorAll('textarea').forEach(function(ta){ ta.value = ''; });
+    document.querySelectorAll('.slot-msg').forEach(function(el){
+      el.textContent = ''; el.className = 'slot-msg';
+    });
+  }
+</script>
+</body>
+</html>

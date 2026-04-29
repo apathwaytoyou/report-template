@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <base target="_top">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand:      #e7aa98;
+      --brand-dark: #2a1008;
+      --brand-pale: rgba(231,170,152,0.12);
+      --brand-mid:  rgba(231,170,152,0.25);
+      --text:       #1a1a1a;
+      --muted:      #5a5a5a;
+      --hint:       #888;
+      --bg:         #faf9f8;
+      --white:      #ffffff;
+      --border:     #e0d9d5;
+      --radius:     8px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--bg);
+      padding: 0;
+      margin: 0;
+    }
+
+    .header {
+      background: var(--brand);
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--brand-dark);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .section-heading {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--muted);
+      padding: 12px 14px 6px;
+      background: var(--bg);
+    }
+
+    .hint {
+      font-size: 11px;
+      color: var(--hint);
+      padding: 0 14px 8px;
+      line-height: 1.4;
+    }
+
+    .acc-section {
+      border-bottom: 1px solid var(--border);
+    }
+    .acc-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 14px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 12px;
+    }
+    .acc-head:hover { background: var(--brand-pale); }
+    .acc-head strong { font-weight: 600; color: var(--text); }
+    .acc-count {
+      font-size: 10px;
+      background: var(--brand-pale);
+      border-radius: 10px;
+      padding: 1px 6px;
+      color: var(--muted);
+      margin-right: 6px;
+    }
+    .acc-count.has-sel {
+      background: var(--brand-mid);
+      color: #7a3010;
+      font-weight: 600;
+    }
+    .chevron {
+      font-size: 10px;
+      transition: transform .2s;
+    }
+    .acc-head.open .chevron { transform: rotate(180deg); }
+    .acc-body {
+      display: none;
+      padding: 6px 14px 10px;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .acc-body.open { display: flex; }
+
+    .chip-section {
+      padding: 0 14px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .chip-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .chip {
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2px 10px;
+      font-size: 11px;
+      cursor: pointer;
+      background: var(--white);
+      color: var(--muted);
+      user-select: none;
+    }
+    .chip.active {
+      border-color: var(--brand);
+      background: var(--brand-mid);
+      color: #7a3010;
+      font-weight: 600;
+    }
+
+    .small-btn {
+      font-size: 11px;
+      padding: 2px 7px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--white);
+      cursor: pointer;
+      color: var(--muted);
+    }
+    .small-btn:hover { background: var(--bg); }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      padding: 12px 14px;
+      position: sticky;
+      bottom: 0;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+    }
+    button.primary {
+      flex: 1;
+      padding: 9px 14px;
+      background: var(--brand);
+      border: none;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--brand-dark);
+    }
+    button.primary:hover   { background: #d99a86; }
+    button.primary:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    button.secondary {
+      padding: 9px 12px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--muted);
+    }
+    button.secondary:hover { background: var(--bg); }
+
+    #status {
+      margin: 8px 14px;
+      padding: 8px 10px;
+      border-radius: var(--radius);
+      font-size: 12px;
+      line-height: 1.45;
+      display: none;
+    }
+    #status.success { background: #dff0d8; color: #2d6a2d; display: block; }
+    #status.warn    { background: #fff3cd; color: #7a5c00; display: block; }
+    #status.error   { background: #fde8e8; color: #8b1a1a; display: block; }
+    #status.info    { background: #e8f0fe; color: #1a3a6c; display: block; }
+
+    #loading {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--hint);
+    }
+
+    #app { display: none; }
+  </style>
+</head>
+<body>
+
+<div class="header">Resource List Generator</div>
+
+<div id="loading">Loading filters…</div>
+
+<div id="app">
+
+  <!-- Population / Need (Accordion) -->
+  <div class="section-heading">Population / Need</div>
+  <div class="hint">Selections become <strong>H3 headings</strong> in the Doc — pick everything relevant to this client.</div>
+  <div id="popAccordion"></div>
+
+  <!-- Format (Chips) -->
+  <div class="chip-section">
+    <div class="section-heading" style="padding-left:0">Medium / Format</div>
+    <div class="hint" style="padding-left:0;padding-bottom:6px">Leave all unchecked to include every format.</div>
+    <div style="display:flex;gap:6px;margin-bottom:6px">
+      <button class="small-btn" onclick="selectAllFormats()">All</button>
+      <button class="small-btn" onclick="clearAllFormats()">None</button>
+    </div>
+    <div class="chip-grid" id="formatGrid"></div>
+  </div>
+
+  <!-- Cost (Chips) -->
+  <div class="chip-section">
+    <div class="section-heading" style="padding-left:0">Cost</div>
+    <div class="hint" style="padding-left:0;padding-bottom:6px">Leave all unchecked to include every cost range.</div>
+    <div style="display:flex;gap:6px;margin-bottom:6px">
+      <button class="small-btn" onclick="selectAllCosts()">All</button>
+      <button class="small-btn" onclick="clearAllCosts()">None</button>
+    </div>
+    <div class="chip-grid" id="costGrid"></div>
+  </div>
+
+  <!-- Actions -->
+  <div class="btn-row">
+    <button class="secondary" onclick="resetTracking()" title="Allow re-inserting resources already added to this report">↺ Start Fresh</button>
+    <button class="secondary" onclick="clearAll()">Clear</button>
+    <button class="primary" id="submitBtn" onclick="submit()">Insert Resources</button>
+  </div>
+
+  <div id="status"></div>
+</div>
+
+<script>
+  // Load config data on page load
+  google.script.run
+    .withSuccessHandler(buildUI)
+    .withFailureHandler(function(err) {
+      showStatus('Failed to load filters: ' + err.message, 'error');
+    })
+    .getSidebarData();
+
+  function buildUI(data) {
+    buildPopAccordion(data.populations);
+    buildFormatGrid(data.formats);
+    buildCostGrid(data.costs);
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+  }
+
+  function buildPopAccordion(populations) {
+    var container = document.getElementById('popAccordion');
+    Object.entries(populations).forEach(function(entry) {
+      var group = entry[0];
+      var tags  = entry[1];
+
+      var section = document.createElement('div');
+      section.className = 'acc-section';
+
+      var head = document.createElement('div');
+      head.className = 'acc-head';
+      head.innerHTML =
+        '<strong>' + escHtml(group) + '</strong>' +
+        '<div style="display:flex;align-items:center;gap:4px">' +
+        '<span class="acc-count" data-group="' + escHtml(group) + '">0 selected</span>' +
+        '<span class="chevron">▾</span></div>';
+
+      var body = document.createElement('div');
+      body.className = 'acc-body';
+
+      tags.forEach(function(tag) {
+        var chip = makeChip(tag, 'chip', function() {
+          chip.classList.toggle('active');
+          updateGroupCount(group);
+        });
+        body.appendChild(chip);
+      });
+
+      head.addEventListener('click', function() {
+        var isOpen = head.classList.contains('open');
+        head.classList.toggle('open', !isOpen);
+        body.classList.toggle('open', !isOpen);
+      });
+
+      section.appendChild(head);
+      section.appendChild(body);
+      container.appendChild(section);
+    });
+  }
+
+  function updateGroupCount(group) {
+    var countEl = document.querySelector('.acc-count[data-group="' + group + '"]');
+    if (!countEl) return;
+    var section = countEl.closest('.acc-section');
+    var n = section.querySelectorAll('.chip.active').length;
+    countEl.textContent = n + ' selected';
+    countEl.classList.toggle('has-sel', n > 0);
+  }
+
+  function buildFormatGrid(formats) {
+    var grid = document.getElementById('formatGrid');
+    formats.forEach(function(fmt) {
+      var chip = makeChip(fmt, 'chip', function() { chip.classList.toggle('active'); });
+      grid.appendChild(chip);
+    });
+  }
+
+  function buildCostGrid(costs) {
+    var grid = document.getElementById('costGrid');
+    costs.forEach(function(cost) {
+      var chip = makeChip(cost, 'chip', function() { chip.classList.toggle('active'); });
+      grid.appendChild(chip);
+    });
+  }
+
+  function makeChip(value, className, onClick) {
+    var el = document.createElement('span');
+    el.className     = className;
+    el.textContent   = value;
+    el.dataset.value = value;
+    el.addEventListener('click', onClick);
+    return el;
+  }
+
+  function getChecked(selector) {
+    var nodes  = document.querySelectorAll(selector + ' .chip.active');
+    var values = [];
+    for (var i = 0; i < nodes.length; i++) {
+      values.push(nodes[i].dataset.value);
+    }
+    return values;
+  }
+
+  function clearAll() {
+    var actives = document.querySelectorAll('.chip.active');
+    for (var i = 0; i < actives.length; i++) actives[i].classList.remove('active');
+    var counts = document.querySelectorAll('.acc-count');
+    for (var j = 0; j < counts.length; j++) {
+      counts[j].textContent = '0 selected';
+      counts[j].classList.remove('has-sel');
+    }
+    showStatus('', '');
+  }
+
+  function selectAllFormats() {
+    var chips = document.querySelectorAll('#formatGrid .chip');
+    for (var i = 0; i < chips.length; i++) chips[i].classList.add('active');
+  }
+
+  function clearAllFormats() {
+    var chips = document.querySelectorAll('#formatGrid .chip');
+    for (var i = 0; i < chips.length; i++) chips[i].classList.remove('active');
+  }
+
+  function selectAllCosts() {
+    var chips = document.querySelectorAll('#costGrid .chip');
+    for (var i = 0; i < chips.length; i++) chips[i].classList.add('active');
+  }
+
+  function clearAllCosts() {
+    var chips = document.querySelectorAll('#costGrid .chip');
+    for (var i = 0; i < chips.length; i++) chips[i].classList.remove('active');
+  }
+
+  function showStatus(msg, type) {
+    var el = document.getElementById('status');
+    el.textContent = msg;
+    el.className   = type;
+  }
+
+  function escHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function resetTracking() {
+    if (!confirm('Clear the record of inserted resources for this document?\n\nThis allows re-inserting resources already added — use this if you want to start the resources section over.')) {
+      return;
+    }
+    google.script.run
+      .withSuccessHandler(function(result) {
+        showStatus(result.message, 'success');
+      })
+      .withFailureHandler(function(err) {
+        showStatus('Error: ' + err.message, 'error');
+      })
+      .resetTracking_();
+  }
+
+  function submit() {
+    var populations = getChecked('#popAccordion');
+
+    if (!populations.length) {
+      showStatus('Please select at least one Population/Need — these become the H3 headings in your document.', 'warn');
+      return;
+    }
+
+    var filters = {
+      populations: populations,
+      formats:     getChecked('#formatGrid'),
+      costs:       getChecked('#costGrid')
+    };
+
+    showStatus('Inserting resources…', 'info');
+    document.getElementById('submitBtn').disabled = true;
+
+    google.script.run
+      .withSuccessHandler(function(result) {
+        document.getElementById('submitBtn').disabled = false;
+        showStatus(result.message, result.status === 'success' ? 'success' : 'warn');
+      })
+      .withFailureHandler(function(err) {
+        document.getElementById('submitBtn').disabled = false;
+        showStatus('Error: ' + err.message, 'error');
+      })
+      .insertResources(filters);
+  }
+</script>
+</body>
+</html>

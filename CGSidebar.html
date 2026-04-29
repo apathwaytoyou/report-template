@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    margin: 0;
+    padding: 10px;
+    background: #f5f7fa;
+    color: #172B36;
+  }
+  h3 {
+    font-size: 14px;
+    margin: 0 0 10px 0;
+    color: #172B36;
+  }
+  .section {
+    background: #fff;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  }
+  .section-header {
+    font-size: 12px;
+    font-weight: bold;
+    padding: 8px 10px;
+    cursor: pointer;
+    border-radius: 8px;
+    background: #DAE9F1;
+    color: #172B36;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .section-body {
+    display: none;
+    padding: 8px 10px;
+  }
+  .section-body.open { display: block; }
+  .slot-label {
+    font-size: 11px;
+    font-weight: bold;
+    color: #555;
+    margin: 10px 0 3px 0;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+  }
+  textarea {
+    width: 100%;
+    height: 70px;
+    font-size: 12px;
+    padding: 5px 7px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    resize: vertical;
+    background: #fafafa;
+  }
+  .btn-push {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 4px 10px;
+    background: #172B36;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .btn-push:hover { background: #0f1e27; }
+  .slot-msg {
+    font-size: 11px;
+    color: #4A9B6F;
+    margin-left: 8px;
+    min-height: 14px;
+  }
+  .slot-row {
+    display: flex;
+    align-items: center;
+    margin-top: 4px;
+  }
+  .global-msg {
+    font-size: 12px;
+    color: #4A9B6F;
+    text-align: center;
+    min-height: 16px;
+    margin-bottom: 8px;
+  }
+</style>
+</head>
+<body>
+
+<h3>🔲 Coventry Grid</h3>
+<div class="global-msg" id="globalMsg"></div>
+<button class="btn-push" style="width:100%;margin-bottom:10px;padding:7px;" onclick="pushAll()">Push All Filled Slots</button>
+
+<div class="section">
+  <div class="section-header" onclick="toggle(this)">
+    1 — Consistency of thinking and behavior <span>▶</span>
+  </div>
+  <div class="section-body">
+    <div class="slot-label">1.1 Preference for predictability in daily life</div>
+    <textarea id="CG-1.1" placeholder="Enter lived experience bullet points…"></textarea>
+    <div class="slot-row">
+      <button class="btn-push" onclick="pushSlot('CG-1.1')">Push</button>
+      <span class="slot-msg" id="msg-CG-1.1"></span>
+    </div>
+
+    <div class="slot-label">1.2 Difficulties with eating</div>
+    <textarea id="CG-1.2" placeholder="Enter lived experience bullet points…"></textarea>
+    <div class="slot-row">
+      <button class="btn-push" onclick="pushSlot('CG-1.2')">Push</button>
+      <span class="slot-msg" id="msg-CG-1.2"></span>
+    </div>
+
+    <div class="slot-label">1.3 Repetitive use of language</div>
+    <textarea id="CG-1.3" placeholder="Enter lived experience bullet points…"></textarea>
+    <div class="slot-row">
+      <button class="btn-push" onclick="pushSlot('CG-1.3')">Push</button>
+      <span class="slot-msg" id="msg-CG-1.3"></span>
+    </div>
+
+    <div class="slot-label">1.4 Differences of relationships with possessions</div>
+    <textarea id="CG-1.4" placeholder="Enter lived experience bullet points…"></textarea>
+    <div class="slot-row">
+      <button class="btn-push" onclick="pushSlot('CG-1.4')">Push</button>
+      <span class="slot-msg" id="msg-CG-1.4"></span>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header" onclick="toggle(this)">
+    2 — Intense and focused interests <span>▶</span>
+  </div>
+  <div class="section-body">
+    <div class="slot-label">2.1 Differences in hobbies or interests</div>
+    <textarea id="CG-2.1" placeholder="Enter lived experience bullet points…"></textarea>
+    <div class="slot-row">
+      <button class="btn-push" onclick="pushSlot('CG-2.1')">Push</button>
+      <span class="slot-msg" id="msg-CG-2.1"></span>
+    </div>
+
+    <div class="slot-label">2.2 Social interaction related to interests</div>
+    <textarea id="CG-2.2" placeholder="Enter lived experience bullet points…"></textarea>
+    <div class="slot-row">
+      <button class="btn-push" onclick="pushSlot('CG-2.2')">Push</button>
+      <span class="slot-msg" id="msg-CG-2.2"></span>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header" onclick="toggle(this)">
+    3 — Social interaction/communication <span>▶</span>
+  </div>
+  <div class="section-body">
+    <div class="slot-label">3.1 Differences with social interaction</div>
+    <textarea id="CG-3.1" placeholder="Enter lived experience bullet points…"></textarea>
+    <div class="slot-row">
+      <button class="btn-push" onclick="pushSlot('CG-3.1')">Push</button>
+      <span class="slot-msg" id="msg-CG-3.1"></span>
+    </div>
+
+    <div class="slot-label">3.2 Differences in group interactions</div>
+    <textarea id="CG-3.2" placeholder="Enter lived experience bullet points…"></textarea>
+    <div class="slot-row">
+      <button class="btn-push" onclick="pushSlot('CG-3.2')">Push</button>
+      <span class="slot-msg" id="msg-CG-3.2"></span>
+    </div>
+
+    <div class="slot-label">3.3 Differences in intimate relationships</div>
+    <textarea id="CG-3.3" placeholder="Enter lived experience bullet points…"></textarea>
+    <div class="slot-row">
+      <button class="btn-push" onclick="pushSlot('CG-3.3')">Push</button>
+      <span class="slot-msg" id="msg-CG-3.3"></span>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header" onclick="toggle(this)">
+    4 — Cognitive empathy <span>▶</span>
+  </div>
+  <div class="section-body">
+    <div class="slot-label">4.1 Differences in relating to others' views and thoughts</div>
+    <textarea id="CG-4.1" placeholder="Enter lived experience bullet points…"></textarea>
+    <div class="slot-row">
+      <button class="btn-push" onclick="pushSlot('CG-4.1')">Push</button>
+      <span class="slot-msg" id="msg-CG-4.1"></span>
+    </div>
+
+    <div class="slot-label">4.2 Differences of understanding how others may see them</div>
+    <textarea id="CG-4.2" placeholder="Enter lived experience bullet points…"></textarea>
+    <div class="slot-row">
+      <button class="btn-push" onclick="pushSlot('CG-4.2')">Push</button>
+      <span class="slot-msg" id="msg-CG-4.2"></span>
+    </div>
+
+    <div class="slot-label">4.3 Problems distinguishing between fact and fiction</div>
+    <textarea id="CG-4.3" placeholder="Enter lived experience bullet points…"></textarea>
+    <div class="slot-row">
+      <button class="btn-push" onclick="pushSlot('CG-4.3')">Push</button>
+      <span class="slot-msg" id="msg-CG-4.3"></span>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header" onclick="toggle(this)">
+    5 — Emotional regulation <span>▶</span>
+  </div>
+  <div class="section-body">
+    <div class="slot-label">5.1 Difficulties managing own emotions</div>
+    <textarea id="CG-5.1" placeholder="Enter lived experience bullet points…"></textarea>
+    <div class="slot-row">
+      <button class="btn-push" onclick="pushSlot('CG-5.1')">Push</button>
+      <span class="slot-msg" id="msg-CG-5.1"></span>
+    </div>
+
+    <div class="slot-label">5.2 Relationship to others' emotions</div>
+    <textarea id="CG-5.2" placeholder="Enter lived experience bullet points…"></textarea>
+    <div class="slot-row">
+      <button class="btn-push" onclick="pushSlot('CG-5.2')">Push</button>
+      <span class="slot-msg" id="msg-CG-5.2"></span>
+    </div>
+
+    <div class="slot-label">5.3 Mood change factors</div>
+    <textarea id="CG-5.3" placeholder="Enter lived experience bullet points…"></textarea>
+    <div class="slot-row">
+      <button class="btn-push" onclick="pushSlot('CG-5.3')">Push</button>
+      <span class="slot-msg" id="msg-CG-5.3"></span>
+    </div>
+
+    <div class="slot-label">5.4 Inclined to sudden extreme anxiety</div>
+    <textarea id="CG-5.4" placeholder="Enter lived experience bullet points…"></textarea>
+    <div class="slot-row">
+      <button class="btn-push" onclick="pushSlot('CG-5.4')">Push</button>
+      <span class="slot-msg" id="msg-CG-5.4"></span>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header" onclick="toggle(this)">
+    6 — Executive functioning <span>▶</span>
+  </div>
+  <div class="section-body">
+    <div class="slot-label">6.1 Differences of memory</div>
+    <textarea id="CG-6.1" placeholder="Enter lived experience bullet points…"></textarea>
+    <div class="slot-row">
+      <button class="btn-push" onclick="pushSlot('CG-6.1')">Push</button>
+      <span class="slot-msg" id="msg-CG-6.1"></span>
+    </div>
+
+    <div class="slot-label">6.2 Differences of time perception</div>
+    <textarea id="CG-6.2" placeholder="Enter lived experience bullet points…"></textarea>
+    <div class="slot-row">
+      <button class="btn-push" onclick="pushSlot('CG-6.2')">Push</button>
+      <span class="slot-msg" id="msg-CG-6.2"></span>
+    </div>
+
+    <div class="slot-label">6.3 Detail orientation</div>
+    <textarea id="CG-6.3" placeholder="Enter lived experience bullet points…"></textarea>
+    <div class="slot-row">
+      <button class="btn-push" onclick="pushSlot('CG-6.3')">Push</button>
+      <span class="slot-msg" id="msg-CG-6.3"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggle(header) {
+    var body  = header.nextElementSibling;
+    var arrow = header.querySelector('span');
+    var open  = body.classList.toggle('open');
+    arrow.textContent = open ? '▼' : '▶';
+  }
+
+  function pushSlot(slotId) {
+    var text = document.getElementById(slotId).value.trim();
+    if (!text) {
+      showMsg(slotId, 'Nothing to push.');
+      return;
+    }
+    showMsg(slotId, '⏳ Pushing…');
+    google.script.run
+      .withSuccessHandler(function() {
+        showMsg(slotId, '✅ Done.');
+        document.getElementById(slotId).value = '';
+      })
+      .withFailureHandler(function(err) {
+        showMsg(slotId, '❌ ' + err.message);
+      })
+      .pushCGSnippet(slotId, text);
+  }
+
+  function showMsg(slotId, msg) {
+    var el = document.getElementById('msg-' + slotId);
+    el.textContent = msg;
+    setTimeout(function() { el.textContent = ''; }, 4000);
+  }
+
+  var ALL_SLOTS = [
+    'CG-1.1','CG-1.2','CG-1.3','CG-1.4',
+    'CG-2.1','CG-2.2',
+    'CG-3.1','CG-3.2','CG-3.3',
+    'CG-4.1','CG-4.2','CG-4.3',
+    'CG-5.1','CG-5.2','CG-5.3','CG-5.4',
+    'CG-6.1','CG-6.2','CG-6.3'
+  ];
+
+  function pushAll() {
+    var count = 0;
+    ALL_SLOTS.forEach(function(slotId) {
+      var text = document.getElementById(slotId).value.trim();
+      if (text) { pushSlot(slotId); count++; }
+    });
+    if (count === 0) {
+      document.getElementById('globalMsg').textContent = '⚠️ No slots have content.';
+      setTimeout(function(){ document.getElementById('globalMsg').textContent = ''; }, 4000);
+    }
+  }
+</script>
+</body>
+</html>
